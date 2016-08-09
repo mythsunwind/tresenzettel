@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Tresenzettel</string>
+    <string name="title_activity_main">Tresenzettel App</string>
+    <string name="count_opening_balance">Kasse vorher zählen</string>
+    <string name="count_final_balance">Kasse nachher zählen</string>
+    <string name="count_opening_stock">Anfangsbestand zählen</string>
+    <string name="count_final_stock">Endbestand zählen</string>
+</resources>
