@@ -61,6 +61,9 @@ public class SheetsController {
                 }
                 sheet.setOpeningStockFilename(record.get(Sheet.HEADER_OPENING_STOCK));
                 sheet.setFinalStockFilename(record.get(Sheet.HEADER_FINAL_STOCK));
+                sheet.setBeveragesTotal(format.parse(record.get(Sheet.HEADER_BEVERAGES_TOTAL)).doubleValue());
+                sheet.setRevenue(format.parse(record.get(Sheet.HEADER_REVENUE)).doubleValue());
+                sheet.setSoli(format.parse(record.get(Sheet.HEADER_SOLI)).doubleValue());
                 sheets.add(sheet);
             }
             parser.close();
@@ -158,6 +161,24 @@ public class SheetsController {
         updateSheetInFile(context, updatedSheet);
     }
 
+    public static void saveBeverageTotal(Context context, int sheetNumber, double beverageTotal) throws LoadSheetsException {
+        Sheet updatedSheet = getSheet(context, sheetNumber);
+        updatedSheet.setBeveragesTotal(beverageTotal);
+        updateSheetInFile(context, updatedSheet);
+    }
+
+    public static void saveRevenue(Context context, int sheetNumber, double revenue) throws LoadSheetsException {
+        Sheet updatedSheet = getSheet(context, sheetNumber);
+        updatedSheet.setRevenue(revenue);
+        updateSheetInFile(context, updatedSheet);
+    }
+
+    public static void saveSoli(Context context, int sheetNumber, double soli) throws LoadSheetsException {
+        Sheet updatedSheet = getSheet(context, sheetNumber);
+        updatedSheet.setSoli(soli);
+        updateSheetInFile(context, updatedSheet);
+    }
+
     public static void saveFinalBalance(Context context, int sheetNumber, double balance) throws LoadSheetsException {
         Sheet updatedSheet = getSheet(context, sheetNumber);
         updatedSheet.setFinalBalance(balance);
@@ -212,7 +233,7 @@ public class SheetsController {
                 outputWriter.write("\",\"");
                 outputWriter.write(sheet.getFinalStockFilename());
                 outputWriter.write("\",\"");
-                outputWriter.write(format.format(sheet.getBeverageTotal()));
+                outputWriter.write(format.format(sheet.getBeveragesTotal()));
                 outputWriter.write("\",\"");
                 outputWriter.write(format.format(sheet.getRevenue()));
                 outputWriter.write("\",\"");

@@ -1,14 +1,11 @@
 package net.nostate.drugstore.tresenzettel;
 
-import android.content.Intent;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
 import net.nostate.drugstore.tresenzettel.controller.CalculatorController;
-import net.nostate.drugstore.tresenzettel.controller.CalculatorTask;
 import net.nostate.drugstore.tresenzettel.controller.SheetsController;
 import net.nostate.drugstore.tresenzettel.controller.StockFileController;
 import net.nostate.drugstore.tresenzettel.exceptions.LoadSheetsException;
@@ -28,6 +25,8 @@ public class CalculationActivity extends AppCompatActivity {
     private CalculationAdapter adapter;
     private Sheet sheet;
 
+    private NumberFormat format = NumberFormat.getInstance(Locale.GERMANY);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +39,42 @@ public class CalculationActivity extends AppCompatActivity {
 
         int sheetNumber = getIntent().getExtras().getInt("sheetNumber");
 
-        Object[] objects = new Object[2];
-        objects[0] = sheetNumber;
-        objects[1] = adapter;
-        new CalculatorTask().execute(objects);
+        Log.v(TAG, "Try to calculate...");
+        try {
+            sheet = SheetsController.getSheet(adapter.getContext(), sheetNumber);
+        } catch (LoadSheetsException e) {
+            updateUI(LogLevel.ERROR, e.getMessage());
+            return;
+        }
+
+        if(!sheet.getOpeningStockFilename().isEmpty() && !sheet.getFinalStockFilename().isEmpty()) {
+            try {
+                List<Beverage> openingStock = StockFileController.loadStockFromFile(adapter.getContext(), sheet.getOpeningStockFilename());
+                List<Beverage> finalStock = StockFileController.loadStockFromFile(adapter.getContext(), sheet.getFinalStockFilename());
+
+                double beverageTotal = CalculatorController.getBeveragesTotal(adapter, openingStock, finalStock);
+                updateUI(LogLevel.RESULT, "Getränke Total:" + format.format(beverageTotal));
+
+                double openingBalance = sheet.getOpeningBalance();
+                double finalBalance = sheet.getFinalBalance();
+
+                double revenue = CalculatorController.getRevenue(adapter, beverageTotal, openingBalance, finalBalance);
+                updateUI(LogLevel.RESULT, "Umsatz:" + format.format(revenue));
+                double soli = CalculatorController.getSoli(adapter, beverageTotal, openingBalance, finalBalance);
+                updateUI(LogLevel.RESULT, "Soli:" + format.format(soli));
+
+                SheetsController.saveBeverageTotal(getApplicationContext(), sheetNumber, beverageTotal);
+                SheetsController.saveRevenue(getApplicationContext(), sheetNumber, revenue);
+                SheetsController.saveSoli(getApplicationContext(), sheetNumber, soli);
+            } catch (Exception e) {
+                Log.e(TAG, "Calculation failed: " + e.getMessage());
+                updateUI(LogLevel.ERROR, "Getränke-Kalkulation fehlgeschlagen:" + e.getMessage());
+                return;
+            }
+        }
+    }
+
+    private void updateUI(LogLevel level, String entry) {
+        adapter.add(new CalculationLogEntry(level, entry));
     }
 }

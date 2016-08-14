@@ -22,7 +22,7 @@ public class Sheet {
     private Date finalBalanceDate = null;
     private String openingStockFilename = "";
     private String finalStockFilename = "";
-    private double beverageTotal = 0.0;
+    private double beveragesTotal = 0.0;
     private double revenue = 0.0;
     private double soli = 0.0;
 
@@ -58,8 +58,8 @@ public class Sheet {
         return finalStockFilename;
     }
 
-    public double getBeverageTotal() {
-        return beverageTotal;
+    public double getBeveragesTotal() {
+        return beveragesTotal;
     }
 
     public double getRevenue() {
@@ -96,5 +96,17 @@ public class Sheet {
 
     public void setFinalStockFilename(String finalStockFilename) {
         this.finalStockFilename = finalStockFilename;
+    }
+
+    public void setBeveragesTotal(double beverageTotal) {
+        this.beveragesTotal = beverageTotal;
+    }
+
+    public void setRevenue(double revenue) {
+        this.revenue = revenue;
+    }
+
+    public void setSoli(double soli) {
+        this.soli = soli;
     }
 }
