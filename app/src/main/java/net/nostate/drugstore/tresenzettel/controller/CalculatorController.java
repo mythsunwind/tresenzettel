@@ -1,13 +1,13 @@
 package net.nostate.drugstore.tresenzettel.controller;
 
-import android.util.Log;
-
-import net.nostate.drugstore.tresenzettel.exceptions.CalculatorException;
+import net.nostate.drugstore.tresenzettel.CalculationAdapter;
 import net.nostate.drugstore.tresenzettel.models.Beverage;
+import net.nostate.drugstore.tresenzettel.models.CalculationLogEntry;
 
-import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
+
+import static net.nostate.drugstore.tresenzettel.models.CalculationLogEntry.LogLevel;
 
 public class CalculatorController {
 
@@ -17,7 +17,7 @@ public class CalculatorController {
 
     public static void checkStock(List<Beverage> getraenkeVorher, List<Beverage> getraenkeNachher) {
         // Checke ob eine Getränke-Art vorher da war, aber nicht mehr nachher
-        for(Beverage getraenkVorher: getraenkeVorher) {
+        for (Beverage getraenkVorher : getraenkeVorher) {
             for (Beverage getraenkNachher : getraenkeNachher) {
 
             }
@@ -26,36 +26,72 @@ public class CalculatorController {
         // Checke ob eine neue Getränke-Art nachher da ist
     }
 
-    public static double getGetraenkeTotal(List<Beverage> getraenkeVorher, List<Beverage> getraenkeNachher) {
-        double getraenkeTotal = 0.0;
-        for(Beverage getraenkVorher: getraenkeVorher) {
-            Log.v(TAG, "Kalkuliere " + getraenkVorher.getName() + "...");
-            for(Beverage getraenkNachher: getraenkeNachher) {
-                if(getraenkVorher.getName().equals(getraenkNachher.getName())) {
-                    Log.v(TAG, "Getränk in Endbestand gefunden: " + getraenkVorher.getName());
-                    Log.v(TAG, "Kästen vorher: " + getraenkVorher.getCases());
-                    Log.v(TAG, "Flaschen vorher: " + getraenkVorher.getBottles());
-                    Log.v(TAG, "Kästen nachher: " + getraenkNachher.getCases());
-                    Log.v(TAG, "Flaschen nachher: " + getraenkNachher.getBottles());
-                    Log.v(TAG, "Flaschen pro Kasten: " + getraenkVorher.getBottlesPerCase());
-                    int flaschenVorher = getraenkVorher.getCases() * getraenkVorher.getBottlesPerCase() + getraenkVorher.getBottles();
-                    int flaschenNachher = getraenkNachher.getCases() * getraenkNachher.getBottlesPerCase() + getraenkNachher.getBottles();
-                    Log.v(TAG, "Insgesamt Flaschen vorher: " + flaschenVorher);
-                    Log.v(TAG, "Insgesamt Flaschen nachher: " + flaschenNachher);
+    public static double getBeveragesTotal(CalculationAdapter adapter, List<Beverage> openingBeverages, List<Beverage> finalBeverages) {
+        double beveragesTotal = 0.0;
+        for (Beverage openingBeverage : openingBeverages) {
+            adapter.add(new CalculationLogEntry(LogLevel.INFO, "Kalkuliere " + openingBeverage.getName() + "..."));
+            for (Beverage finalBeverage : finalBeverages) {
+                if (openingBeverage.getName().equals(finalBeverage.getName())) {
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Getränk in Endbestand gefunden: " + openingBeverage.getName()));
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Kästen vorher: " + openingBeverage.getCases()));
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Flaschen vorher: " + openingBeverage.getBottles()));
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Kästen nachher: " + finalBeverage.getCases()));
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Flaschen nachher: " + finalBeverage.getBottles()));
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Flaschen pro Kasten: " + openingBeverage.getBottlesPerCase()));
+                    int openingBottles = openingBeverage.getCases() * openingBeverage.getBottlesPerCase() + openingBeverage.getBottles();
+                    int finalBottles = finalBeverage.getCases() * finalBeverage.getBottlesPerCase() + finalBeverage.getBottles();
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Insgesamt Flaschen vorher: " + openingBottles));
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Insgesamt Flaschen nachher: " + finalBottles));
 
-                    int wenigerFlaschen = flaschenVorher - flaschenNachher;
+                    int diffBottles = openingBottles - finalBottles;
 
-                    Log.v(TAG, wenigerFlaschen + " Flaschen weniger bei " + getraenkVorher.getName());
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, diffBottles + " Flaschen weniger bei " + openingBeverage.getName()));
 
-                    double versoffen = wenigerFlaschen * getraenkVorher.getSKP();
-                    Log.v(TAG, wenigerFlaschen + " Flaschen * SKP von " + getraenkVorher.getSKP() + " = " + versoffen);
+                    double versoffen = diffBottles * openingBeverage.getSKP();
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, diffBottles + " Flaschen * SKP von " + openingBeverage.getSKP() + " = " + versoffen));
 
-                    getraenkeTotal = getraenkeTotal + versoffen;
-                    Log.v(TAG, "Neuer Total-Wert: " + getraenkeTotal);
+                    beveragesTotal = beveragesTotal + versoffen;
+                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Neuer Total-Wert: " + beveragesTotal));
                 }
             }
         }
 
-        return getraenkeTotal;
+        return beveragesTotal;
+    }
+
+    public static double getRevenue(CalculationAdapter adapter, double beveragesTotal, double openingBalance, double finalBalance) {
+        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Kalkuliere Umsatz..."));
+        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Kasse vorher = " + openingBalance));
+        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Kasse nachher = " + finalBalance));
+        if (finalBalance < openingBalance) {
+            adapter.add(new CalculationLogEntry(LogLevel.ERROR, "Kasse nachher ist kleiner als Kasse vorher!"));
+            adapter.add(new CalculationLogEntry(LogLevel.ERROR, "Wo ist das Geld geblieben?"));
+            return 0;
+        }
+        double whatShouldBeIn = openingBalance + beveragesTotal;
+        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Was sollte drin sein (Kasse vorher + Getränke Total) = " + whatShouldBeIn));
+        if (finalBalance < whatShouldBeIn) {
+            adapter.add(new CalculationLogEntry(LogLevel.ERROR, "Kasse nachher ist kleiner als Kasse vorher + Getränke Total!"));
+            adapter.add(new CalculationLogEntry(LogLevel.ERROR, "Bezahlt mal euern Suff!"));
+            return finalBalance - openingBalance;
+        } else {
+            return beveragesTotal;
+        }
+    }
+
+    public static double getSoli(CalculationAdapter adapter, double beveragesTotal, double openingBalance, double finalBalance) {
+        double whatShouldBeIn = openingBalance + beveragesTotal;
+        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Kalkuliere Soli..."));
+        if (finalBalance < openingBalance) {
+            adapter.add(new CalculationLogEntry(LogLevel.ERROR, "Kein Geld, kein Soli!"));
+            return 0;
+        }
+        if (finalBalance < whatShouldBeIn) {
+            adapter.add(new CalculationLogEntry(LogLevel.ERROR, "Kostenlos gesoffen, daher kein Soli :("));
+            return 0;
+        }
+        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Was sollte drin sein = " + whatShouldBeIn));
+        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Kasse nachher = " + finalBalance));
+        return finalBalance - whatShouldBeIn;
     }
 }

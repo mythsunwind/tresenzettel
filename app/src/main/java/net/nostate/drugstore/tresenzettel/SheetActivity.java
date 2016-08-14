@@ -31,9 +31,6 @@ public class SheetActivity extends AppCompatActivity {
     private Button finalBalanceButton;
     private Button finalStockButton;
     private Button calculationButton;
-    private TextView beverageTotalTextView;
-    private TextView revenueTextView;
-    private TextView soliTextView;
 
     private NumberFormat format = NumberFormat.getInstance(Locale.GERMANY);
 
@@ -50,9 +47,6 @@ public class SheetActivity extends AppCompatActivity {
         finalBalanceButton = (Button) findViewById(R.id.FinalBalanceButton);
         finalStockButton = (Button) findViewById(R.id.FinalStockButton);
         calculationButton = (Button) findViewById(R.id.CalculationButton);
-        beverageTotalTextView = (TextView) findViewById(R.id.BeverageTotalTextView);
-        revenueTextView = (TextView) findViewById(R.id.RevenueTextView);
-        soliTextView = (TextView) findViewById(R.id.SoliTextView);
 
         Intent intent = getIntent();
 
@@ -77,10 +71,6 @@ public class SheetActivity extends AppCompatActivity {
             }
 
             enableButtons(sheet);
-
-            beverageTotalTextView.setText(String.valueOf(sheet.getBeverageTotal()));
-            revenueTextView.setText(String.valueOf(sheet.getRevenue()));
-            soliTextView.setText(String.valueOf(sheet.getSoli()));
         } else {
             // get last sheet number
             int lastSheetNumber = intent.getExtras().getInt("LastSheetNumber");
@@ -164,29 +154,15 @@ public class SheetActivity extends AppCompatActivity {
         calculationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(TAG, "Try to calculate...");
+                Intent intent = new Intent(getApplicationContext(), CalculationActivity.class);
                 try {
                     sheet = SheetsController.getSheet(getApplicationContext(), sheetNumber);
                 } catch (LoadSheetsException e) {
                     Snackbar.make(findViewById(R.id.sheetLayout), e.getMessage(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     return;
                 }
-                if(!sheet.getOpeningStockFilename().isEmpty() && !sheet.getFinalStockFilename().isEmpty()) {
-                    try {
-                        List<Beverage> openingStock = StockFileController.loadStockFromFile(getApplicationContext(), sheet.getOpeningStockFilename());
-                        List<Beverage> finalStock = StockFileController.loadStockFromFile(getApplicationContext(), sheet.getFinalStockFilename());
-
-                        //CalculatorController.checkStock(openingStock, finalStock);
-
-                        double beverageTotal = CalculatorController.getGetraenkeTotal(openingStock, finalStock);
-                        beverageTotalTextView.setText(format.format(beverageTotal));
-                    } catch (Exception e) {
-                        Log.e(TAG, "Calculation failed: " + e.getMessage());
-                        Snackbar.make(findViewById(R.id.sheetLayout),
-                                "Getränke-Kalkulation fehlgeschlagen: " + e.getMessage(),
-                                Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    }
-                }
+                intent.putExtra("sheetNumber", sheet.getNumber());
+                startActivity(intent);
             }
         });
     }

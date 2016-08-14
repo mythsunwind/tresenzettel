@@ -24,8 +24,10 @@
         <activity android:name=".StockActivity" />
         <activity android:name=".BeverageCountActivity" />
         <activity android:name=".SheetActivity" />
-        <activity android:name=".BalanceActivity"
-            android:windowSoftInputMode="stateAlwaysVisible"></activity>
+        <activity
+            android:name=".BalanceActivity"
+            android:windowSoftInputMode="stateAlwaysVisible" />
+        <activity android:name=".CalculationActivity"></activity>
     </application>
 
 </manifest>

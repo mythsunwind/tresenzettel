@@ -3,4 +3,12 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff4081</color>
+    <color name="backgroundColorLogEntryVerbose">#eeeeee</color>
+    <color name="backgroundColorLogEntryWarn">#ffe08c</color>
+    <color name="backgroundColorLogEntryError">#ff4040</color>
+    <color name="backgroundColorLogEntryResult">#3F51B5</color>
+    <color name="textColorLogEntryVerbose">#6E6E6E</color>
+    <color name="textColorLogEntryWarn">#6E6E6E</color>
+    <color name="textColorLogEntryError">#000000</color>
+    <color name="textColorLogEntryResult">#ffffff</color>
 </resources>
