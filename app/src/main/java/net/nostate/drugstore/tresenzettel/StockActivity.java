@@ -32,6 +32,8 @@ public class StockActivity extends AppCompatActivity {
     public static final String COUNT_BEVERAGE_ACTIVITY_NAME = "NAME";
     public static final String COUNT_BEVERAGE_ACTIVITY_CASES = "CASES";
     public static final String COUNT_BEVERAGE_ACTIVITY_BOTTLES = "BOTTLES";
+    public static final String COUNT_BEVERAGE_ACTIVITY_BOTTLES_PER_CASE = "BOTTLES_PER_CASE";
+    public static final String COUNT_BEVERAGE_ACTIVITY_SKP = "SKP";
 
     private List<Beverage> beverages = new ArrayList<>();
     private BeverageCountAdapter adapter;
@@ -112,6 +114,8 @@ public class StockActivity extends AppCompatActivity {
                 intent.putExtra(COUNT_BEVERAGE_ACTIVITY_NAME, beverages.get(position).getName());
                 intent.putExtra(COUNT_BEVERAGE_ACTIVITY_CASES, beverages.get(position).getCases());
                 intent.putExtra(COUNT_BEVERAGE_ACTIVITY_BOTTLES, beverages.get(position).getBottles());
+                intent.putExtra(COUNT_BEVERAGE_ACTIVITY_BOTTLES_PER_CASE, beverages.get(position).getBottlesPerCase());
+                intent.putExtra(COUNT_BEVERAGE_ACTIVITY_SKP, beverages.get(position).getSKP());
                 startActivityForResult(intent, COUNT_BEVERAGE_ACTIVITY);
             }
         });

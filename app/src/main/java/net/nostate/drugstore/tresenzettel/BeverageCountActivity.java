@@ -9,6 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class BeverageCountActivity extends AppCompatActivity {
 
     private static final String TAG = BeverageCountActivity.class.getSimpleName();
@@ -17,10 +20,15 @@ public class BeverageCountActivity extends AppCompatActivity {
     private String name = null;
     private int cases = 0;
     private int bottles = 0;
+    private int bottlesPerCase;
+    private double skp;
 
     private EditText casesEditText;
     private EditText bottlesEditText;
     private TextView beverageNameTextView;
+    private TextView informationTextView;
+
+    private NumberFormat format = NumberFormat.getInstance(Locale.GERMANY);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +38,19 @@ public class BeverageCountActivity extends AppCompatActivity {
         beverageNameTextView = (TextView) findViewById(R.id.beverageNameTextView);
         casesEditText = (EditText) findViewById(R.id.casesEditText);
         bottlesEditText = (EditText) findViewById(R.id.bottlesEditText);
+        informationTextView = (TextView) findViewById(R.id.informationTextView);
 
         Intent intent = getIntent();
         itemId = intent.getExtras().getInt(StockActivity.COUNT_BEVERAGE_ACTIVITY_ITEMID, itemId);
         name = intent.getExtras().getString(StockActivity.COUNT_BEVERAGE_ACTIVITY_NAME);
         cases = intent.getExtras().getInt(StockActivity.COUNT_BEVERAGE_ACTIVITY_CASES, cases);
         bottles = intent.getExtras().getInt(StockActivity.COUNT_BEVERAGE_ACTIVITY_BOTTLES, bottles);
+        bottlesPerCase = intent.getExtras().getInt(StockActivity.COUNT_BEVERAGE_ACTIVITY_BOTTLES_PER_CASE);
+        skp = intent.getExtras().getDouble(StockActivity.COUNT_BEVERAGE_ACTIVITY_SKP);
 
         beverageNameTextView.setText(name);
+        informationTextView.setText(getString(R.string.bottles_per_cases) + ": " + bottlesPerCase
+                + " SKP: " + format.format(skp) + " €");
         casesEditText.setText(String.valueOf(cases));
         bottlesEditText.setText(String.valueOf(bottles));
 

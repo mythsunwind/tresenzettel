@@ -25,6 +25,16 @@
             android:textSize="50dp"
             android:textAlignment="center" />
 
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/informationTextView"
+            android:textAlignment="center"
+            android:background="@color/colorAccent"
+            android:textColor="@color/abc_primary_text_material_dark"
+            android:text="Flaschen pro Kasten: SKP:"
+            android:textStyle="bold" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

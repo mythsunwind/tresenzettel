@@ -5,4 +5,6 @@
     <string name="count_final_balance">Kasse nachher zählen</string>
     <string name="count_opening_stock">Anfangsbestand zählen</string>
     <string name="count_final_stock">Endbestand zählen</string>
+    <string name="bottles_per_cases">Flaschen pro Kasten</string>
+    <string name="skp">SKP</string>
 </resources>
