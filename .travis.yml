@@ -6,11 +6,6 @@ android:
     - extra-android-support
     - extra-android-m2repository
 
-install:
-  # Check install section: http://docs.travis-ci.com/user/build-configuration/#install
-  # If you'd like to skip the install stage entirely, set it to true and nothing will be run.
-  - true
-
 script:
   # By default Travis-ci executes './gradlew build connectedCheck' if no 'script:' section found.
   - ./gradlew build
