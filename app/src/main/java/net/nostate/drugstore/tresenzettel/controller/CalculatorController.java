@@ -44,14 +44,19 @@ public class CalculatorController {
                     adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Insgesamt Flaschen nachher: " + finalBottles));
 
                     int diffBottles = openingBottles - finalBottles;
+                    
+                    if (diffBottles < 0) {
+                        adapter.add(new CalculationLogEntry(LogLevel.WARN, "Es sind plötzlich " + (diffBottles * -1)
+                            + " Flaschen mehr als bei der Anfangsabrechnung. Überprüfe bitte nochmal die Flaschen bei " + openingBeverage.getName()));
+                    } else {
+                        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, diffBottles + " Flaschen weniger bei " + openingBeverage.getName()));
 
-                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, diffBottles + " Flaschen weniger bei " + openingBeverage.getName()));
+                        double versoffen = diffBottles * openingBeverage.getSKP();
+                        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, diffBottles + " Flaschen * SKP von " + openingBeverage.getSKP() + " = " + versoffen));
 
-                    double versoffen = diffBottles * openingBeverage.getSKP();
-                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, diffBottles + " Flaschen * SKP von " + openingBeverage.getSKP() + " = " + versoffen));
-
-                    beveragesTotal = beveragesTotal + versoffen;
-                    adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Neuer Total-Wert: " + beveragesTotal));
+                        beveragesTotal = beveragesTotal + versoffen;
+                        adapter.add(new CalculationLogEntry(LogLevel.VERBOSE, "Neuer Total-Wert: " + beveragesTotal));
+                    }
                 }
             }
         }
