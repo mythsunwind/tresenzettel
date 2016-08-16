@@ -1,20 +1,27 @@
 language: android
 android:
   components:
-    - build-tools-21.0.0
-    - android-23
-    - extra-android-support
-    - extra-android-m2repository
-
+  - build-tools-21.0.0
+  - android-23
+  - extra-android-support
+  - extra-android-m2repository
 script:
-  # By default Travis-ci executes './gradlew build connectedCheck' if no 'script:' section found.
-  - ./gradlew build
-
+- ./gradlew build
+before_install:
+- openssl aes-256-cbc -K $encrypted_8a91a2e4bf70_key -iv $encrypted_8a91a2e4bf70_iv
+  -in .keystore.enc -out .keystore -d
+before_deploy:
+- jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 app/build/outputs/apk/app-release-unsigned.apk tresenzettel -keystore .keystore -storepass $storepass -keypass $keypass
+- "${ANDROID_HOME}/build-tools/21.0.0/zipalign 4 app/build/outputs/apk/app-release-unsigned.apk app/build/outputs/apk/tresenzettel.apk"
 deploy:
   provider: releases
   api_key:
     secure: 4N90MY8u6NTZpDmPVMRal8Z+0Ax/X7v8cvC6QEHcBuV8kdN1E9gV3NH9lnRZUM+eC4FW2cc39PnsLwvYecNFa5ZseiHZOSzmkjw3JCJYyIBjQm+HnBVFDDdk3n6tKQxJYRqFyYx/ut0hfOE2BvXAvmYsEFv/P3OjCGUYK3Y1GHNgvcoGzqkeN7QUuy74cwn6H0cRSO+EmjdwEVaBA3kahFNwrA1H/8oDpiRilUw2TU/YLPcZYagfiQap9Cof6Ieh8CF4hi0CwOWjiHCxkOhHn9jrkn6XhC3US/mbwCIzcRcdhnmZC/ziKrLJ2MFFDgm6l6VrSe/Hm2ff5AKSWkKshvYySMGjw/8jSHnSPmtOYuPykIwB/8nOgtlSMwBAtNq5FDyyHFD64fFOqnFt1kjxF9Ea5E7Pog6KyE9pw4GRSwhqz34A6VPzgrqkdg7HkppzwZra2hkMlHTVOqVrm1Ze+9908fcU3MAttPZB2TSP3IC4DPGLg+haRbrr7lpFTvwy0ZuGcKXKJOPcJJo4/k9Ua1Yli17rx99minug8hP98kbt4k3A2ZDTnqVNrsIgLvPF3qEK0BH76kqfdoXDh22JaR7/2R1Mj0DzyjphdddoW1rlyYEqunJ6Ofjf7r3F8vnMIhm0zyas4rjEE2S1gSO1MmypoIvba9gEC+m/4vfXIeA=
-  file: app/build/outputs/apk/app-release-unsigned.apk
+  file: app/build/outputs/apk/tresenzettel.apk
   skip_cleanup: true
   on:
     tags: true
+env:
+  global:
+  - secure: gIY1H02vkzQGlH9IuWGeUZR6PffYDnT7s35r255sWp7Pw+u6xd6nWtlFhKROH+fUYZz2OoedEbrz1Su5yE+be856ujFpcTO82TQpXVwFe95RCOyI3/0j8WEOXxNkkWHpDs0VfAlXO6FoCnVpqcB9T0c7WsYNnR1NS498iWKDWGZsrMQIT6uug6VW6iF+vCob9+WBBZjhEMVUlVnuVA9ZTKqXSIcfW7RLFXyot7wyiZtC5fHqH9ttRCdi0W/3qb5HQGxyfhS2QSIVWsBXUEsCKuZeyT6o8jOUEoDDKDAelSwDrGemfvAcsvucbG7lQWi/YJMoWJaGirnRgz+XmDjMioA1H/GwgB7e8ob4fyz+XPjlamRe2X8t/QS1LqSk1gKmz7zmMShrSedR330ZLeB1MNbSmlasT992woftKLBFnMfXBGaKfCeZzPRemq9CInF6efvAt3bdYB9m/+988HcQmZHYuPZ3PelkYTRIJYw8gINSdc7QIZPWRqqX11vtl6KDXpBWGIbmiwMULJ8RIk+x5c9bBSQU5DWXlC3bQjj/Vbs5QEcc5JOv8S8h4f3gPvZ6zl1puR8mMc9LrhCCo3QJbW4AVIr09hVRLYWgni2vvkrPzJek0hgVLwmUxxwGnH1pxgSaMSGKPJUVdllJDH3epAOm3HXf++zVCbxwxQyhLJ8=
+  - secure: UIXVqW6mgKkLywOajaZt0a4WrSVjAUYOaejURtv83xVaqYOX+HXRMtea4vXn4MdbbOim7Me0OeR9QRRlWSH1KqQSOZRn7Xs5VfonBD20nXIAnqYsxwragSZkYvf+1YKiYmHCzofEkhFI22tUwKcre/zNi9NOvkrF6U6jMfTAWsNujcE/3yKOBS058Ii0PD60VYm4DN8uBaZeKrpiLftUvfgzs5ddOihVG0xYvM6zYJyKqYZ3xq0Vy87U/O3r7iOrs/x54gBkQW5D8C7ZfQgBEMS/vUxfFabPOw82zpzGjqayACog+m2Nxrpu0dD/GDnQxfJDJJeXrdizOQPkI6cpMU2lH2hn0o/PeNvPVFLy7QgRg8NSBku7BTvWeE7d8APSd/GZHC6dZKk0fCkW/JPvXcl38m2sUi37Bt294WbeDXNA8KlkaStKXOa4zfuxduYkziAp0BGds8dwjOXBFdZY66rU7BOqxE0z0ePpP4sUveFvh/K4I60+b6VI1t0y6zOwWKzU+fBv3QZxkDjo8K8YNlCtG6cfjttj0oLzKmS1Opb66kmudero0mPDdslgXCVbWZDsjuS/gJovysSAGtusEjhe2OoNFSmS2qlFGRlVFnmvtTTayW8HOq2MbB3MVPUcy/74gtAwp8OjpfHKTtgCgSnrU11gprFVG+6gXOXqyiQ=
