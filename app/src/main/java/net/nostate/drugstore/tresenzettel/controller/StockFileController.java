@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import net.nostate.drugstore.tresenzettel.R;
 import net.nostate.drugstore.tresenzettel.exceptions.ImportException;
 import net.nostate.drugstore.tresenzettel.exceptions.LoadStockException;
 import net.nostate.drugstore.tresenzettel.models.Beverage;
@@ -17,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.NumberFormat;
@@ -164,23 +166,23 @@ public class StockFileController {
     }
 
     private static void writeSampleImportFile(Context context) {
-        FileOutputStream fileout = null;
+        FileOutputStream out = null;
         try {
             File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), IMPORT_FILE);
-            fileout = new FileOutputStream(file);
-            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
-            outputWriter.write("\"Getränk\",\"Flaschen pro Kasten\",\"SKP\",\"VKP\"\n");
-            outputWriter.write("\"Sternburg Export 0,5l\",\"20\",\"0,5\",1\n");
-            outputWriter.write("\"Berliner Pilsener 0,5l\",\"20\",\"0,7\",\"1,3\"\n");
-            outputWriter.write("\"Berliner Kindl Jubiläums 0,5l\",\"20\",\"0,7\",\"1,3\"\n");
-            outputWriter.write("\"Fritz Limo 0,33l\",\"24\",\"0,7\",\"1,3\"");
-            outputWriter.close();
+            out = new FileOutputStream(file);
+            InputStream in = context.getResources().openRawResource(R.raw.importcsv);
+            byte[] buffer = new byte[1024];
+            int len = in.read(buffer);
+            while (len != -1) {
+                out.write(buffer, 0, len);
+                len = in.read(buffer);
+            }
         } catch (IOException e) {
             Log.e(TAG, "Could not create sample import file: " + e.getMessage());
         } finally {
             try {
-                fileout.flush();
-                fileout.close();
+                out.flush();
+                out.close();
             } catch (IOException e) {
                 Log.e(TAG, "Couldn't close file: " + e.getMessage());
             }
