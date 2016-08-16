@@ -9,3 +9,12 @@ android:
 script:
   # By default Travis-ci executes './gradlew build connectedCheck' if no 'script:' section found.
   - ./gradlew build
+
+deploy:
+  provider: releases
+  api_key:
+    secure: 4N90MY8u6NTZpDmPVMRal8Z+0Ax/X7v8cvC6QEHcBuV8kdN1E9gV3NH9lnRZUM+eC4FW2cc39PnsLwvYecNFa5ZseiHZOSzmkjw3JCJYyIBjQm+HnBVFDDdk3n6tKQxJYRqFyYx/ut0hfOE2BvXAvmYsEFv/P3OjCGUYK3Y1GHNgvcoGzqkeN7QUuy74cwn6H0cRSO+EmjdwEVaBA3kahFNwrA1H/8oDpiRilUw2TU/YLPcZYagfiQap9Cof6Ieh8CF4hi0CwOWjiHCxkOhHn9jrkn6XhC3US/mbwCIzcRcdhnmZC/ziKrLJ2MFFDgm6l6VrSe/Hm2ff5AKSWkKshvYySMGjw/8jSHnSPmtOYuPykIwB/8nOgtlSMwBAtNq5FDyyHFD64fFOqnFt1kjxF9Ea5E7Pog6KyE9pw4GRSwhqz34A6VPzgrqkdg7HkppzwZra2hkMlHTVOqVrm1Ze+9908fcU3MAttPZB2TSP3IC4DPGLg+haRbrr7lpFTvwy0ZuGcKXKJOPcJJo4/k9Ua1Yli17rx99minug8hP98kbt4k3A2ZDTnqVNrsIgLvPF3qEK0BH76kqfdoXDh22JaR7/2R1Mj0DzyjphdddoW1rlyYEqunJ6Ofjf7r3F8vnMIhm0zyas4rjEE2S1gSO1MmypoIvba9gEC+m/4vfXIeA=
+  file: app/build/outputs/apk/app-release-unsigned.apk
+  skip_cleanup: true
+  on:
+    tags: true
